@@ -1,137 +1,142 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <title>Formularz</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator</title>
+    <style>
+        body {
+            background-color: black;
+            font-family: 'Arial', sans-serif;
+            display: grid;
+            place-items: center;
+            min-height: 90vh;
+        }
+        .kalkulator {
+            width: 280px;
+            border-radius: 8px; /* zaokragla ramke */
+            overflow: hidden; /* obcina wszystko za pojemnikiem */
+        }
+        #wyswietlacz {
+            width: 100%;
+            height: 75px;
+            background: #333;
+            color: white;
+            border: none;
+            font-size: 2.5em;
+            text-align: right;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .przyciski {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* dziele na 4 rowne kolumny */
+        }
+        button {
+            height: 70px;
+            border: 1px solid #444;
+            background: rgb(49, 42, 42);
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        button:active {
+            background: #666;
+        }
+        .operator {
+            background: blue;
+        }
+        .clear {
+            background: rgb(168, 46, 46);
+        }
+        .backspace {
+            background: red;
+            grid-column: span 2;
+        }
+        .equals {
+            background: green;
+            grid-column: span 2;
+        }
+    </style>
 </head>
 <body>
 
-  <h1>Formularz</h1>
+    <div class="kalkulator">
+        <input type="text" id="wyswietlacz" readonly>
+        <div class="przyciski">
+            <button onclick="append('7')">7</button> <!-- onclick - zdarzenie -->
+            <button onclick="append('8')">8</button>
+            <button onclick="append('9')">9</button>
+            <button class="operator" onclick="append('/')">/</button> <!-- class, aby móc nadać inny kolor tła -->
+            
+            <button onclick="append('4')">4</button>
+            <button onclick="append('5')">5</button>
+            <button onclick="append('6')">6</button>
+            <button class="operator" onclick="append('*')">*</button>
+            
+            <button onclick="append('1')">1</button>
+            <button onclick="append('2')">2</button>
+            <button onclick="append('3')">3</button>
+            <button class="operator" onclick="append('-')">-</button>
 
-  <form action="" method="get">
-    
-    <table>
-      
-      <tr>        
-        <td>
-          <label for="imie">Imię:</label>
-        </td>
-        <td>
-          <input type="text" id="imie" name="imie">
-        </td>
-      </tr>
-	  
-	  <tr>
-        <td>
-          <label for="nazwisko">Nazwisko:</label>
-        </td>
-        <td>
-          <input type="text" id="nazwisko" name="nazwisko">
-        </td>
-      </tr>
-	  
-	  <tr>
-        <td>
-          Płeć:
-        </td>
-        
-        <td>
-          <input type="radio" id="plec_k" name="wybor_plci" value="kobieta"> <!--name ma byc jednakowy, abyśmy nie wybrali jednocześnie 2 -->
-          <label for="plec_k">Kobieta</label>
-          
-          <input type="radio" id="plec_m" name="wybor_plci" value="mezczyzna">
-          <label for="plec_m">Mężczyzna</label>
-        </td>
-      </tr>
-	  
-	  <tr>
-	    <td>
-		  <label for="data_urodzenia">Data urodzenia:</label>
-		</td>
-		<td>
-		  <input type="date" id="data_urodzenia" name="data_urodzenia">
-		</td>
-	  </tr>
-	  
-	  <tr>
-	    <td>
-		  <label for="haslo">Hasło:</label>
-		</td>
-		<td>
-		  <input type="password" id="haslo" name="haslo">
-		</td>
-	  </tr>
-	  
-	  <tr>
-        <td>
-          <label for="ulica">Ulica:</label>
-        </td>
-        <td>
-          <input type="text" id="ulica" name="ulica">
-        </td>
-      </tr>
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button onclick="append('0')">0</button>
+            <button onclick="append('.')">.</button>
+            <button class="operator" onclick="append('+')">+</button>
+            
+            <button class="backspace" onclick="backspace()">&larr;</button> <!-- strzałka w lewo -->
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+    </div>
 
-      <tr>
-        <td>
-          <label for="miasto">Miasto:</label>
-        </td>
-        <td>
-          <input type="text" id="miasto" name="miasto">
-        </td>
-      </tr>
-	  
-	  <tr>
-	    <td>
-		  <label for="email">E-mail:</label>
-		</td>
-		<td>
-		  <input type="email" id="email" name="email">
-		</td>
-	  </tr>
-	  
-	  <tr>
-        <td>
-          <label for="telefon">Telefon:</label>
-        </td>
-        <td>
-          <input type="tel" id="telefon" name="telefon">
-        </td>
-      </tr>
-      
-      <tr>
-        <td>
-          <label for="prawo_jazdy">Prawo jazdy:</label>
-        </td>
-        <td>
-          <input type="checkbox" id="prawo_jazdy" name="prawo_jazdy" value="tak">
-        </td>
-      </tr>
-	  
-	  <tr>
-        <td>
-          <label for="wojewodztwo">Województwo:</label>
-        </td>
-        <td>
-          <input type="text" id="wojewodztwo" name="wojewodztwo">
-        </td>
-      </tr>
-	  
-	  <tr>
-	    <td>
-		  <label for="uwagi">Uwagi:</label>
-		</td>
-		<td>
-		  <textarea id="uwagi" name="uwagi" maxlength="43"></textarea>
-	  </tr>
-	  
-	  <tr>
-	    <td>
-		  <input type="submit" value="Wyślij">
-		</td>
-	  </tr>
-	  
-    </table>
-  </form>
+    <script>
+        const wyswietlacz = document.getElementById('wyswietlacz');
+        const operatory = ['+', '-', '*', '/', '.'];
+
+        function append(wartosc) 
+        {
+            const ostatniZnak = wyswietlacz.value.slice(-1);
+
+            if (operatory.includes(wartosc) && operatory.includes(ostatniZnak)) /* zabezpieczenie (jednakowe znaki pod rząd) */
+            {
+                return;
+            }
+            
+            if (wyswietlacz.value === 'Błąd') 
+            {
+                wyswietlacz.value = wartosc;
+            } 
+            else 
+            {
+                wyswietlacz.value += wartosc;
+            }
+        }
+
+        function clearDisplay() 
+        {
+            wyswietlacz.value = '';
+        }
+
+        function backspace() 
+        {
+            wyswietlacz.value = wyswietlacz.value.slice(0, -1);
+        }
+
+        function calculate() 
+        {
+            try 
+            {
+                if (wyswietlacz.value) 
+                {
+                    wyswietlacz.value = eval(wyswietlacz.value);
+                }
+            } 
+            catch 
+            {
+                wyswietlacz.value = 'Błąd';
+            }
+        }
+    </script>
 
 </body>
 </html>

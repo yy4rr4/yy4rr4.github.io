@@ -126,7 +126,7 @@
             })
             .catch(error => {
                 console.error("Błąd wczytywania pliku XML:", error);
-                alert("Nie można załadować pliku dane.xml. Uruchom stronę przez Live Server.");
+                alert("BŁĄD: Nie udało się wczytać pliku dane.xml. Serwer odpowiedział: " + error);
             });
         
         

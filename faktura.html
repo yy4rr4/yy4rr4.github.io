@@ -114,7 +114,7 @@
 
     <script>
         // Używamy fetch, aby asynchronicznie pobrać nasz plik XML
-        fetch('faktura.xml')
+        fetch('dane.xml')
             .then(response => response.text()) // Pobieramy zawartość jako tekst
             .then(xmlDataString => {
                 // Gdy plik się wczyta, parsujemy go
@@ -126,7 +126,7 @@
             })
             .catch(error => {
                 console.error("Błąd wczytywania pliku XML:", error);
-                alert("Nie można załadować pliku faktura.xml. Uruchom stronę przez Live Server.");
+                alert("Nie można załadować pliku dane.xml. Uruchom stronę przez Live Server.");
             });
         
         

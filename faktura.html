@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faktura z XML</title>
+    <style>
+        body {
+            background-color: #e0e0e0;
+            font-family: Arial, sans-serif;
+            font-size: 13px; /* Rozmiar bazowy dla faktury */
+        }
+
+        /* KROK 1: KONTENER
+           To jest nasz główny "stół", na którym kładziemy obrazek faktury.
+           - Musi mieć wymiary obrazka (827x1169 pikseli).
+           - "position: relative" to KLUCZ. Mówi, że wszystkie "pola"
+             będą pozycjonowane względem tego kontenera, a nie całej strony.
+        */
+        #faktura-kontener {
+            width: 827px;
+            height: 1169px;
+            background-image: url('fvat.png');
+            background-repeat: no-repeat;
+            
+            position: relative; /* NAJWAŻNIEJSZE: Baza dla "celowania" */
+            
+            margin: 20px auto; /* Wyśrodkowanie strony */
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* KROK 2: POLA DO "CELOWANIA"
+           - "position: absolute" to nasze "celowanie". 
+             Każde pole będzie miało precyzyjne współrzędne "top" i "left".
+        */
+        .pole {
+            position: absolute;
+        }
+
+        /* KROK 3: PRECYZYJNE "CELOWANIE"
+           Ustawiamy każde pole w odpowiednim miejscu.
+           Wartości "top" i "left" to odległość od GÓRNEGO LEWEGO rogu obrazka tła.
+        */
+        
+        #pole-numer { top: 68px; left: 160px; font-weight: bold; }
+        #pole-miejsce-data { top: 68px; left: 560px; }
+        
+        #pole-termin-platnosci { top: 120px; left: 55px; }
+        #pole-forma-platnosci { top: 120px; left: 240px; }
+        #pole-data-dostawy { top: 140px; left: 530px; }
+
+        #pole-sprzedawca { top: 200px; left: 55px; line-height: 1.5; }
+        #pole-nabywca { top: 200px; left: 450px; line-height: 1.5; }
+        
+        #pole-numer-konta { top: 385px; left: 170px; }
+        
+        /* Kontener na dynamiczną listę pozycjonujemy na początku pierwszej linii */
+        #pole-lista-pozycji {
+            top: 486px;
+            left: 45px;
+            width: 740px;
+        }
+        
+        /* KROK 4: KOLUMNY DLA LISTY
+           Musimy ostylować dynamicznie tworzone wiersze, aby pasowały do kolumn.
+           Używamy Flexboxa do łatwego podziału.
+        */
+        .wiersz {
+            display: flex; /* Układa elementy (kolumny) obok siebie */
+            height: 25.5px; /* Wysokość jednego wiersza na obrazku */
+            line-height: 25.5px; /* Centrowanie tekstu w pionie */
+            font-size: 12px;
+        }
+
+        /* Szerokości poszczególnych kolumn - to wymagało dopasowania */
+        .wiersz .kol-lp { width: 30px; text-align: center; }
+        .wiersz .kol-nazwa { width: 250px; padding-left: 5px; }
+        .wiersz .kol-pkwiu { width: 85px; text-align: center; }
+        .wiersz .kol-jm { width: 50px; text-align: center; }
+        .wiersz .kol-ilosc { width: 55px; text-align: center; }
+        .wiersz .kol-cena { width: 100px; text-align: right; }
+        .wiersz .kol-wartosc { width: 105px; text-align: right; padding-right: 5px; }
+
+        /* Pole RAZEM */
+        #pole-razem {
+            top: 743px;
+            left: 680px;
+            width: 105px;
+            text-align: right;
+            padding-right: 5px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="faktura-kontener">
+        <div id="pole-numer" class="pole"></div>
+        <div id="pole-miejsce-data" class="pole"></div>
+        <div id="pole-termin-platnosci" class="pole"></div>
+        <div id="pole-forma-platnosci" class="pole"></div>
+        <div id="pole-data-dostawy" class="pole"></div>
+        <div id="pole-numer-konta" class="pole"></div>
+        <div id="pole-sprzedawca" class="pole"></div>
+        <div id="pole-nabywca" class="pole"></div>
+        
+        <div id="pole-lista-pozycji" class="pole">
+            </div>
+        
+        <div id="pole-razem" class="pole"></div>
+    </div>
+
+
+    <script>
+        // Używamy fetch, aby asynchronicznie pobrać nasz plik XML
+        fetch('faktura.xml')
+            .then(response => response.text()) // Pobieramy zawartość jako tekst
+            .then(xmlDataString => {
+                // Gdy plik się wczyta, parsujemy go
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlDataString, "text/xml");
+                
+                // Uruchamiamy naszą główną funkcję, przekazując jej sparsowany XML
+                wypelnijFakture(xmlDoc);
+            })
+            .catch(error => {
+                console.error("Błąd wczytywania pliku XML:", error);
+                alert("Nie można załadować pliku faktura.xml. Uruchom stronę przez Live Server.");
+            });
+        
+        
+        // Główna funkcja, która wypełnia "pudełka"
+        function wypelnijFakture(xmlDoc) {
+
+            // Funkcja pomocnicza do pobierania tekstu z XML
+            function getText(tag) {
+                return xmlDoc.querySelector(tag).textContent;
+            }
+            // Funkcja pomocnicza do pobierania HTML (dla <br> w adresie)
+            function getHtml(tag) {
+                return xmlDoc.querySelector(tag).innerHTML;
+            }
+
+            // --- 1. Wypełnianie pól statycznych ---
+            document.getElementById('pole-numer').innerText = getText('numer');
+            document.getElementById('pole-miejsce-data').innerText = getText('miejsce_data');
+            document.getElementById('pole-termin-platnosci').innerText = getText('termin_platnosci');
+            document.getElementById('pole-forma-platnosci').innerText = getText('forma_platnosci');
+            document.getElementById('pole-data-dostawy').innerText = getText('data_dostawy');
+            document.getElementById('pole-numer-konta').innerText = getText('numer_konta');
+            
+            // Używamy getHtml, aby poprawnie wyświetlić <br> w adresie
+            document.getElementById('pole-sprzedawca').innerHTML = getHtml('sprzedawca');
+            document.getElementById('pole-nabywca').innerHTML = getHtml('nabywca');
+
+            // --- 2. Dynamiczne tworzenie listy usług (PĘTLA) ---
+            const listaContainer = document.getElementById('pole-lista-pozycji');
+            const pozycje = xmlDoc.querySelectorAll('pozycja');
+            let sumaRazem = 0;
+
+            pozycje.forEach(pozycja => {
+                // Pobieramy dane z pojedynczej <pozycja>
+                const lp = pozycja.querySelector('lp').textContent;
+                const nazwa = pozycja.querySelector('nazwa').textContent;
+                const pkwiu = pozycja.querySelector('pkwiu').textContent;
+                const jm = pozycja.querySelector('jm').textContent;
+                const ilosc = parseFloat(pozycja.querySelector('ilosc').textContent);
+                const cena_netto = parseFloat(pozycja.querySelector('cena_netto').textContent);
+
+                // Obliczamy wartość i dodajemy do sumy
+                const wartosc_netto = ilosc * cena_netto;
+                sumaRazem += wartosc_netto;
+                
+                // Tworzymy tekst HTML dla nowego wiersza
+                const wierszHTML = `
+                    <div class="wiersz">
+                        <div class="kol-lp">${lp}</div>
+                        <div class="kol-nazwa">${nazwa}</div>
+                        <div class="kol-pkwiu">${pkwiu}</div>
+                        <div class="kol-jm">${jm}</div>
+                        <div class="kol-ilosc">${ilosc}</div>
+                        <div class="kol-cena">${cena_netto.toFixed(2)}</div>
+                        <div class="kol-wartosc">${wartosc_netto.toFixed(2)}</div>
+                    </div>
+                `;
+                
+                // Dodajemy gotowy wiersz do naszego kontenera
+                listaContainer.innerHTML += wierszHTML;
+            });
+
+            // --- 3. Wypełnianie pola RAZEM ---
+            document.getElementById('pole-razem').innerText = sumaRazem.toFixed(2);
+        }
+    </script>
+
+</body>
+</html>

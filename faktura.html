@@ -93,6 +93,7 @@
 
     </style>
 </head>
+
 <body>
 
     <div id="faktura-kontener">
@@ -111,27 +112,32 @@
         <div id="pole-razem" class="pole"></div>
     </div>
 
-
     <script>
-        // Używamy fetch, aby asynchronicznie pobrać nasz plik XML
-        fetch('dane.xml')
-            .then(response => response.text()) // Pobieramy zawartość jako tekst
-            .then(xmlDataString => {
-                // Gdy plik się wczyta, parsujemy go
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlDataString, "text/xml");
-                
-                // Uruchamiamy naszą główną funkcję, przekazując jej sparsowany XML
-                wypelnijFakture(xmlDoc);
-            })
-            .catch(error => {
-                console.error("Błąd wczytywania pliku XML:", error);
-                alert("BŁĄD: Nie udało się wczytać pliku dane.xml. Serwer odpowiedział: " + error);
-            });
-        
-        
+        // CZEKAMY, AŻ CAŁY DOKUMENT HTML SIĘ ZAŁADUJE
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // Dopiero gdy HTML jest gotowy, wczytujemy plik XML
+            fetch('dane.xml')
+                .then(response => response.text()) // Pobieramy zawartość jako tekst
+                .then(xmlDataString => {
+                    // Gdy plik się wczyta, parsujemy go
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(xmlDataString, "text/xml");
+                    
+                    // Uruchamiamy naszą główną funkcję, przekazując jej sparsowany XML
+                    wypelnijFakture(xmlDoc);
+                })
+                .catch(error => {
+                    // Ten błąd złapie teraz wszystko - błędy wczytywania LUB błędy wypełniania
+                    console.error("Wystąpił błąd:", error);
+                    alert("Wystąpił błąd podczas wczytywania lub przetwarzania faktury: " + error);
+                });
+
+        }); // <- Tego brakowało (zamknięcie bloku addEventListener)
+
+
         // Główna funkcja, która wypełnia "pudełka"
-        function wypelnijFakture(xmlDoc) {
+        function wypelnijFakture(xmlDoc) { // <- Tego brakowało (otwarcie funkcji)
 
             // Funkcja pomocnicza do pobierania tekstu z XML
             function getText(tag) {
@@ -191,7 +197,8 @@
 
             // --- 3. Wypełnianie pola RAZEM ---
             document.getElementById('pole-razem').innerText = sumaRazem.toFixed(2);
-        }
+        
+        } // <- Tego brakowało (zamknięcie funkcji wypelnijFakture)
     </script>
 
 </body>

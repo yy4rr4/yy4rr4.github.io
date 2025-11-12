@@ -6,7 +6,7 @@
     <title>Faktura z XML</title>
     <style>
         body {
-            background-color: #e0e0e0;
+            background-color: black;
             font-family: Arial, sans-serif;
             font-size: 15px; 
         }
@@ -18,7 +18,6 @@
             background-repeat: no-repeat;
             position: relative;
             margin: 20px auto; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
 
         .pole {
@@ -26,7 +25,7 @@
         }
 
         #pole-numer { top: 210px; left: 285px; font-weight: bold; }
-        #pole-miejsce-data { top: 230px; left: 700px; }
+        #pole-miejsce-data { top: 230px; left: 700px; font-weight: bold; }
         
         #pole-termin-platnosci { top: 347px; left: 64px; }
         #pole-forma-platnosci { top: 347px; left: 289px; }
@@ -131,14 +130,14 @@
         <div id="pole-razem" class="pole"></div>
     </div>
 
-    <script>
+   <script>
         document.addEventListener("DOMContentLoaded", function() {
             
             fetch('dane.xml')
-                .then(response => response.text())
-                .then(xmlDataString => {
+                .then(response => response.text()) /* wyciągam zawartość z xml */
+                .then(xmlDataString => { /* zmieniam tekst na obiekt */
                     const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlDataString, "text/xml");
+                    const xmlDoc = parser.parseFromString(xmlDataString, "text/xml"); 
                     
                     if (xmlDoc.getElementsByTagName("parsererror").length) {
                         throw new Error("Błąd parsowania pliku XML. Sprawdź plik dane.xml.");
@@ -155,8 +154,8 @@
 
         function wypelnijFakture(xmlDoc) {
 
-            function getText(tag) {
-                const node = xmlDoc.querySelector(tag);
+            function getText(tag) { /* dla czystego tekstu */
+                const node = xmlDoc.querySelector(tag); /* znajdź element w xml */
                 return node ? node.textContent : '';
             }
             
@@ -173,8 +172,8 @@
             document.getElementById('pole-numer-konta').innerText = getText('numer_konta');
             
             const sprzedawcaNazwa = getText('sprzedawca nazwa');
-            const sprzedawcaAdres = getHtml('sprzedawca adres');
-            document.getElementById('pole-sprzedawca').innerHTML = `<strong>${sprzedawcaNazwa}</strong><br>${sprzedawcaAdres}`;
+            const sprzedawcaAdres = getHtml('sprzedawca adres'); /* aby adres sie złamał na dwie stroki (<br/>) */
+            document.getElementById('pole-sprzedawca').innerHTML = `<strong>${sprzedawcaNazwa}</strong><br>${sprzedawcaAdres} `; /* strong - będzie pogrubiona czcionka */
             
             const nabywcaNazwa = getText('nabywca nazwa');
             const nabywcaAdres = getHtml('nabywca adres');
@@ -183,6 +182,8 @@
             const listaContainer = document.getElementById('pole-lista-pozycji');
             const pozycje = xmlDoc.querySelectorAll('pozycja');
             let sumaRazem = 0;
+
+            let wierszeDoWstawienia = [];
 
             pozycje.forEach(pozycja => {
                 const nazwa = pozycja.querySelector('nazwa').textContent;
@@ -199,19 +200,20 @@
                         <div class="kol-nazwa">${nazwa}</div>
                         <div class="kol-pkwiu">${pkwiu}</div>
                         <div class="kol-jm">${jm}</div>
-                        <div class="kol-ilosc">${ilosc}</div>
-                        <div class="kol-cena">${cena_netto.toFixed(2)}</div>
+                        <div class="kol-ilosc">${ilosc}</div> 
+                        <div class="kol-cena">${cena_netto.toFixed(2)}</div> 
                         <div class="kol-wartosc">${wartosc_netto.toFixed(2)}</div>
                     </div>
-                `;
+                `; /* toFixed2 - oznacza 2 miejsca po przecinku */
                 
-                listaContainer.innerHTML += wierszHTML;
+                wierszeDoWstawienia.push(wierszHTML);
             });
+
+            listaContainer.innerHTML = wierszeDoWstawienia.join('');
 
             document.getElementById('pole-razem').innerText = sumaRazem.toFixed(2);
         
         }
     </script>
-
 </body>
 </html>
